@@ -307,14 +307,18 @@ if ($measure_time == 1) {
 	<p>Global Classroom's subscription libraries provide members with unlimited access to courses that are 
 	focused on the job-relevant skills required to succeed in today's global economy. All courses completed 
 	recognize the member with a Certificate or a Badge of Participation that can be shared with your colleagues 
-	and/or employer.</p> 
+	and/or employer.</p>
 	<?php
 		$loop_i = 1;
 		$t1_cost = array();
+		$t1_pricehtml = array();
 		foreach($products_details as $products_detail_key=>$products_detail_val) {
 			$t1_cost[] = $products_detail_val["cost"];	
 			$t1_uniquecost = array_unique ($t1_cost);
 			asort( $t1_uniquecost, SORT_NUMERIC );
+			$t1_pricehtml[] = $products_detail_val["pricing_html"];	
+			$t1_uniquepricehtml = array_unique ($t1_pricehtml);
+			asort( $t1_uniquepricehtml, SORT_STRING );
 		}
 	?>
 	<div>
@@ -363,24 +367,29 @@ if ($measure_time == 1) {
 <!-- /blockcheck 1 -->		
 <!-- blockcheck 2 -->		
 		<div>
-		    <?php foreach ($t1_uniquecost as $t1_costitem) { ?>								
-				<?php // count number of valid entries to show
-				if ($t1_costitem > 0) {
+		    <?php 
+				foreach ($t1_uniquepricehtml as $t1_pricehtmlitem) { ?>	
+				<?php 
 					$count_i = 0;
-					foreach($products_details as $products_detail_key=>$products_detail_val){							
-						if(isset($lib_ctlg_crse_count[$products_detail_val["short_name"]]) && $lib_ctlg_crse_count[$products_detail_val["short_name"]] > 0) {
-							$library_list_key = $products_detail_val["short_name"];
-							$reg_paid = $reg_paid_status[$library_list_key]["paid_flag"];
-							// Show this library only if not free and not  paid up.							
-							if (($products_detail_val["cost"] == $t1_costitem) && ($reg_paid == 0)) {
-								$count_i = $count_i + 1;										
+					if (isset($t1_pricehtmlitem) && (string) $t1_pricehtmlitem !== '' && strlen($t1_pricehtmlitem) > 1) {
+						foreach($products_details as $products_detail_key=>$products_detail_val){							
+							if(isset($lib_ctlg_crse_count[$products_detail_val["short_name"]]) && $lib_ctlg_crse_count[$products_detail_val["short_name"]] > 0) {
+								$library_list_key = $products_detail_val["short_name"];
+								$reg_paid = $reg_paid_status[$library_list_key]["paid_flag"];
+								// Show this library only if not free and not  paid up.							
+								if ($products_detail_val["pricing_html"] == $t1_pricehtmlitem)  {
+									if (($products_detail_val["cost"] > 0)&& ($reg_paid == 0)) {
+										$count_i = $count_i + 1;
+									}									
+								}
 							}
 						}
 					}
-				}
 				?>
-				<?php if (($t1_costitem > 0) && ($count_i > 0)) { ?>
-					<div class="content_spacer_20px"><h2>$<?php echo $t1_costitem ?> Libraries</h2></div>
+				<?php if ($count_i > 0) { ?>
+					<div class="content_spacer_20px"><h2>
+					<?php echo substr($t1_pricehtmlitem, 1); ?></h2>
+					</div>
 					<div class="row">
 						<?php
 						$loop_i = 1;
@@ -389,7 +398,9 @@ if ($measure_time == 1) {
 								$library_list_key = $products_detail_val["short_name"];
 								$reg_paid = $reg_paid_status[$library_list_key]["paid_flag"];
 								// Show this library only if not free and not  paid up.	
-								if (($products_detail_val["cost"] == $t1_costitem) && ($reg_paid == 0)) { ?>
+								//if (($products_detail_val["cost"] == $t1_costitem) && ($reg_paid == 0)) {
+								if (($products_detail_val["pricing_html"] == $t1_pricehtmlitem) && ($products_detail_val["cost"] > 0) && ($reg_paid == 0)) {
+									?>
 									<div class="col-md-4">
 										<!-- <a class="various fancybox.iframe" href="http://globalclassroomportal.com/educationlibrary/library_template.php?PassedEducationLibrariesKEY=<?php echo $products_detail_val["id"]; ?>"> -->
 										<a data-toggle="collapse" data-parent="#accordion" href="#collapseOneCS_<?php echo $products_detail_val["institution_short_name"]."_".$products_detail_val["id"]; ?>" aria-expanded="false" class="collapsed overview-title">
@@ -562,7 +573,7 @@ if ($measure_time == 1) {
 <script>
 jQuery(document).ready( function () {				
 /* 	$('#cert_collapseCourse_<?php echo $products_detail_val["institution_short_name"]."_".$products_detail_val["id"] . "_" . $ctlg_crse_list_key; ?>').on('show.bs.collapse', function () {
-	  // do something…
+	  // do something�
 	  alert("show accordion ajax");
 	}); */
 	//jQuery(".catalog-accordion").click(function(){
