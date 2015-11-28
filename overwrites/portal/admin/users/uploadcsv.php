@@ -24,7 +24,7 @@ raise_memory_limit("512M");
 ini_set('auto_detect_line_endings', 1);
 
 $FORMAT = array();
-$specialcases = array('username', 'password', 'remoteuser');
+$specialcases = array('username', 'password', 'remoteuser', 'state', 'country');
 // Don't upload social profiles for now. A user can have multiple profiles. Not sure how to put that in a csv.
 $notallowed = array('socialprofile');
 $ALLOWEDKEYS = array_keys(ArtefactTypeProfile::get_all_fields());
@@ -242,7 +242,6 @@ function uploadcsv_validate(Pieform $form, $values) {
         $form->set_error('file', get_string('uploadcsverrortoomanyusers', 'admin', get_string('nusers', 'mahara', $maxcsvlines)));
         return;
     }
-
     foreach ($csvdata->data as $key => $line) {
         // If headers exists, increment i = key + 2 for actual line number
         $i = ($csvusers->get('headerExists')) ? ($key + 2) : ($key + 1);
@@ -334,7 +333,6 @@ function uploadcsv_validate(Pieform $form, $values) {
             }
             $remoteusers[$remoteuser] = true;
         }
-
         // If we didn't even get a username, we can't check for duplicates, so move on.
         if (strlen($username) < 1) {
             continue;
@@ -469,7 +467,6 @@ function uploadcsv_validate(Pieform $form, $values) {
  */
 function uploadcsv_submit(Pieform $form, $values) {
     global $USER, $SESSION, $CSVDATA, $FORMAT, $UPDATES;
-
     $formatkeylookup = array_flip($FORMAT);
 
     $authinstance = (int) $values['authinstance'];
@@ -507,6 +504,9 @@ function uploadcsv_submit(Pieform $form, $values) {
 
     foreach ($CSVDATA as $record) {
         $user = new StdClass;
+		$gcr_users = array();
+		$gcr_users["state"] = "";
+		$gcr_users["country"] = "";
         foreach ($FORMAT as $field) {
             if ($field == 'username'  ||
                 $field == 'firstname' ||
@@ -517,6 +517,9 @@ function uploadcsv_submit(Pieform $form, $values) {
                 $field == 'preferredname') {
                 $user->{$field} = $record[$formatkeylookup[$field]];
             }
+			if($field == 'state'  || $field == 'country') {
+				$gcr_users[$field] = $record[$formatkeylookup[$field]];
+			}
         }
         $user->authinstance = $authinstance;
         if ($USER->get('admin') || get_config_plugin('artefact', 'file', 'institutionaloverride')) {
@@ -535,14 +538,17 @@ function uploadcsv_submit(Pieform $form, $values) {
                 }
                 continue;
             }
-            $profilefields->{$field} = $record[$formatkeylookup[$field]];
+			if($field != 'state'  && $field != 'country') {
+				$profilefields->{$field} = $record[$formatkeylookup[$field]];
+			}	
         }
 
         if (!$values['updateusers'] || !isset($UPDATES[$user->username])) {
             $user->passwordchange = (int)$values['forcepasswordchange'];
-
+			unset($values["state"]);
+			unset($values["country"]);
             $user->id = create_user($user, $profilefields, $institution, $authrecord, $remoteuser, $values, true);
-			
+
 			$current_app_name = explode(".", $_SERVER["HTTP_HOST"]);
 			$current_app_short_name = $current_app_name[0];
 			$current_app_short_name = str_replace("http://", "", $current_app_short_name);
@@ -552,6 +558,8 @@ function uploadcsv_submit(Pieform $form, $values) {
 			$user_obj->setPlatformShortName($current_app_short_name);
 			$user_obj->setUsername($user->username);
 			$user_obj->setUserId($user->id);
+			$user_obj->setState($gcr_users["state"]);
+			$user_obj->setCountry($gcr_users["country"]);
 			$user_obj->setCreatedDatetime(date("Y-m-d H:i:s"));
 			$user_obj->save();
 

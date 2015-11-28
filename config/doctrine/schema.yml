@@ -1835,10 +1835,24 @@ GcrUsers:
       notnull: true
       default: ''
       primary: false
+    state:
+      type: string()
+      fixed: false
+      unsigned: false
+      notnull: false
+      default: ''
+      primary: false
+    country:
+      type: string()
+      fixed: false
+      unsigned: false
+      notnull: false
+      default: ''
+      primary: false	  
     created_datetime:
       type: timestamp()
       fixed: false
       unsigned: false
       notnull: true
       default: ''
-      primary: false	  
+      primary: false

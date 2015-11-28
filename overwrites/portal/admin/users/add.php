@@ -126,6 +126,27 @@ $elements = array(
         'title'        => get_string('institutionadministrator','admin'),
         'ignore'       => !$authinstancecount,
     ),
+ 	'country' => array(
+		'type'        => 'select',
+		'title'       => "Country",
+		'options' => array("Canada" => "Canada", "United States" => "United States"),
+		'defaultvalue' => "United States",
+		'description' => "Country",
+		'rules'       => array(
+			'required' => true,
+		),
+	),	
+	'state' => array(
+		'type'        => 'select',
+		'title'       => "State",
+		'options'	  => array(
+			'Alabama'=> "Alabama", 'Alaska' => "Alaska", 'Arizona' =>"Arizona", 'Arkansas' => "Arkansas", 'California' => "California", 'Colorado' => "Colorado", 'Connecticut' => "Connecticut", 'Delaware' => "Delaware", 'District of Columbia' =>"District of Columbia", 'Florida' => "Florida", 'Georgia' => "Georgia", 'Hawaii' => "Hawaii", 'Idaho' => "Idaho", 'Illinois' => "Illinois", 'Indiana' => "Indiana", 'Iowa' => "Iowa", 'Kansas' => "Kansas", 'Kentucky' => "Kentucky", 'Louisiana' => "Louisiana", 'Maine' => "Maine", 'Maryland' => "Maryland", 'Massachusetts' => "Massachusetts", 'Michigan' => "Michigan", 'Minnesota' => "Minnesota", 'Mississippi' => "Mississippi", 'Missouri' => "Missouri", 'Montana' => "Montana", 'Nebraska' => "Nebraska", 'Nevada' => "Nevada", 'New Hampshire' => "New Hampshire", 'New Jersey' => "New Jersey", 'New Mexico' => "New Mexico", 'New York' => "New York", 'North Carolina' => "North Carolina", 'North Dakota' => "North Dakota", 'Ohio' => "Ohio", 'Oklahoma' => "Oklahoma", 'Oregon' => "Oregon", 'Pennsylvania' => "Pennsylvania", 'Rhode Island' => "Rhode Island", 'South Carolina' => "South Carolina", 'South Dakota' => "South Dakota", 'Tennessee' => "Tennessee", 'Texas' => "Texas", 'Utah' => "Utah", 'Vermont' => "Vermont", 'Virginia' => "Virginia", 'Washington' => "Washington", 'West Virginia' => "West Virginia", 'Wisconsin' => "Wisconsin", 'Wyoming' => "Wyoming", 'Alberta' => "Alberta", 'British Columbia' => "British Columbia", 'Manitoba' => "Manitoba", 'New Brunswick' => "New Brunswick", 'Newfoundland and Labrado' => "Newfoundland and Labrador", 'Northwest Territories' => "Northwest Territories", 'Nova Scotia' => "Nova Scotia", 'Nunavut' => "Nunavut", 'Ontario' => "Ontario", 'Prince Edward Island' => "Prince Edward Island", 'Quebec' => "Quebec", 'Saskatchewan' => "Saskatchewan", 'Yukon' => "Yukon"
+		),
+		'description' => "State",
+		'rules'       => array(
+			'required' => true,
+		),
+	),
     'submit' => array(
         'type' => 'submit',
         'value' => get_string('createuser', 'admin'),
@@ -341,6 +362,8 @@ function adduser_submit(Pieform $form, $values) {
 	$user_obj->setPlatformShortName($current_app_short_name);
 	$user_obj->setUsername($user->username);
 	$user_obj->setUserId($user->id);
+	$user_obj->setCountry($values['country']);
+	$user_obj->setState($values['state']);
 	$user_obj->setCreatedDatetime(date("Y-m-d H:i:s"));
 	$user_obj->save();
 

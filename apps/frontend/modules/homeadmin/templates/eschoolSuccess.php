@@ -47,7 +47,10 @@ jQuery(document).ready(function() {
          </table>
     </div></small>
     <div>
-    <?php print '<a href="' . $CFG->current_app->getInstitution()->getUrl() . '/institution/new' . '"><button>Create a New Trial Platform</button></a>'; ?>
+    <?php 
+	print '<a href="' . $CFG->current_app->getInstitution()->getUrl() . '/institution/new' . '"><button>Create a New Trial Platform</button></a>'; 
+	print '<a href="' . $CFG->current_app->getInstitution()->getUrl() . '/product/bulkImport' . '"><button>Upload Products from Excel</button></a>'; 
+	?>
     <br /><br />
     <small><?php print $totals['eschools']; ?> Platforms</small>
     </div>
